@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NER SmartRoute AI</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🚚
+            <span>
+                NER<br>
+                SmartRoute
+            </span>
+        </div>
+
+        <button onclick="showSection('dashboard')">
+            📊 Dashboard
+        </button>
+
+        <button onclick="showSection('routes')">
+            🗺️ Smart Routes
+        </button>
+
+        <button onclick="showSection('vehicles')">
+            🚚 Vehicles
+        </button>
+
+        <button onclick="showSection('deliveries')">
+            📦 Deliveries
+        </button>
+
+        <button onclick="showSection('alerts')">
+            ⚠️ Alerts
+        </button>
+
+        <button onclick="showSection('analytics')">
+            📈 Analytics
+        </button>
+
+        <div class="sidebar-bottom">
+
+            <button onclick="showSection('settings')">
+                ⚙️ Settings
+            </button>
+
+            <button onclick="logout()">
+                🚪 Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <main class="main">
+
+        <header class="header" id="dashboard">
+
+            <h1>
+                AI-Based Smart Logistics
+            </h1>
+
+            <p>
+                Transportation and Accessibility Intelligence
+                Platform for North Eastern Region
+            </p>
+
+        </header>
+
+
+        <section class="dashboard-cards">
+
+            <div
+                class="dashboard-card"
+                onclick="openDetails('vehicles')"
+            >
+
+                <div class="card-icon">
+                    🚚
+                </div>
+
+                <h3>
+                    Active Vehicles
+                </h3>
+
+                <strong>
+                    128
+                </strong>
+
+                <p>
+                    Click for details →
+                </p>
+
+            </div>
+
+
+            <div
+                class="dashboard-card"
+                onclick="openDetails('deliveries')"
+            >
+
+                <div class="card-icon">
+                    📦
+                </div>
+
+                <h3>
+                    Deliveries
+                </h3>
+
+                <strong>
+                    342
+                </strong>
+
+                <p>
+                    Click for details →
+                </p>
+
+            </div>
+
+
+            <div
+                class="dashboard-card"
+                onclick="openDetails('risk')"
+            >
+
+                <div class="card-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    High Risk Routes
+                </h3>
+
+                <strong>
+                    17
+                </strong>
+
+                <p>
+                    Click for details →
+                </p>
+
+            </div>
+
+
+            <div
+                class="dashboard-card"
+                onclick="openDetails('blockages')"
+            >
+
+                <div class="card-icon">
+                    🚧
+                </div>
+
+                <h3>
+                    Road Blockages
+                </h3>
+
+                <strong>
+                    8
+                </strong>
+
+                <p>
+                    Click for details →
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="live-section">
+
+            <h2>
+                📍 Live Vehicle Location
+            </h2>
+
+            <div class="live-buttons">
+
+                <button onclick="startLiveLocation()">
+                    📍 Start Live Location
+                </button>
+
+                <button onclick="stopLiveLocation()">
+                    ⏹ Stop Tracking
+                </button>
+
+            </div>
+
+            <div id="locationStatus">
+                Location tracking is not started.
+            </div>
+
+            <div class="location-data">
+
+                <div>
+                    Latitude:
+                    <strong id="latitude">
+                        --
+                    </strong>
+                </div>
+
+                <div>
+                    Longitude:
+                    <strong id="longitude">
+                        --
+                    </strong>
+                </div>
+
+                <div>
+                    Accuracy:
+                    <strong id="accuracy">
+                        --
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="route-section"
+            id="routes"
+        >
+
+            <h2>
+                🗺️ AI Smart Route Planner
+            </h2>
+
+            <div class="route-inputs">
+
+                <div class="input-group">
+
+                    <label for="start">
+                        Starting Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="start"
+                        placeholder="Example: Salem"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="destination">
+                        Destination
+                    </label>
+
+                    <input
+                        type="text"
+                        id="destination"
+                        placeholder="Example: Chennai"
+                    >
+
+                </div>
+
+
+                <button onclick="findRoute()">
+                    🤖 Find AI Routes
+                </button>
+
+            </div>
+
+
+            <div class="route-legend">
+
+                <span>
+                    <i class="legend safe"></i>
+                    Safe
+                </span>
+
+                <span>
+                    <i class="legend moderate"></i>
+                    Moderate
+                </span>
+
+                <span>
+                    <i class="legend high"></i>
+                    High Risk
+                </span>
+
+            </div>
+
+
+            <div id="map"></div>
+
+
+            <div id="routeResult">
+
+                Enter a starting location and
+                destination to find routes.
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="monitoring-section"
+            id="monitoring"
+        >
+
+            <h2>
+                🔍 Route Monitoring
+            </h2>
+
+            <p class="monitoring-subtitle">
+                Monitor conditions that affect AI
+                route recommendations.
+            </p>
+
+
+            <div class="monitoring-grid">
+
+
+                <button
+                    class="monitor-card"
+                    onclick="openMonitoring('weather')"
+                >
+
+                    <span class="monitor-icon">
+                        🌦️
+                    </span>
+
+                    <span class="monitor-title">
+                        Weather
+                    </span>
+
+                    <span class="monitor-small">
+                        Monitoring
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="monitor-card"
+                    onclick="openMonitoring('road')"
+                >
+
+                    <span class="monitor-icon">
+                        🚧
+                    </span>
+
+                    <span class="monitor-title">
+                        Road Condition
+                    </span>
+
+                    <span class="monitor-small">
+                        Monitoring
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="monitor-card"
+                    onclick="openMonitoring('traffic')"
+                >
+
+                    <span class="monitor-icon">
+                        🚦
+                    </span>
+
+                    <span class="monitor-title">
+                        Traffic
+                    </span>
+
+                    <span class="monitor-small">
+                        Monitoring
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="monitor-card"
+                    onclick="openMonitoring('terrain')"
+                >
+
+                    <span class="monitor-icon">
+                        ⛰️
+                    </span>
+
+                    <span class="monitor-title">
+                        Terrain
+                    </span>
+
+                    <span class="monitor-small">
+                        Monitoring
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+            <div
+                id="monitorResult"
+                class="monitor-result"
+            >
+
+                <h3>
+                    🤖 Monitoring Dashboard
+                </h3>
+
+                <p>
+                    Select a monitoring option above.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="analysis-section"
+            id="analytics"
+        >
+
+            <div class="risk-panel">
+
+                <h2>
+                    🤖 AI Risk Analysis
+                </h2>
+
+                <div class="risk-score">
+
+                    <strong>
+                        24%
+                    </strong>
+
+                    <h3>
+                        Current Route Risk
+                    </h3>
+
+                    <p>
+                        Low Risk
+                    </p>
+
+                </div>
+
+                <div class="risk-items">
+
+                    <div>
+                        🌦️ Weather
+                        <strong>
+                            Normal
+                        </strong>
+                    </div>
+
+                    <div>
+                        🚧 Road
+                        <strong>
+                            Good
+                        </strong>
+                    </div>
+
+                    <div>
+                        🚦 Traffic
+                        <strong>
+                            Moderate
+                        </strong>
+                    </div>
+
+                    <div>
+                        ⛰️ Terrain
+                        <strong>
+                            Moderate
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="ai-routes-panel">
+
+                <h2>
+                    🤖 AI Recommended Routes
+                </h2>
+
+                <div class="route-table-header">
+
+                    <span>
+                        Route
+                    </span>
+
+                    <span>
+                        Distance
+                    </span>
+
+                    <span>
+                        ETA
+                    </span>
+
+                    <span>
+                        Risk
+                    </span>
+
+                    <span>
+                        Status
+                    </span>
+
+                </div>
+
+
+                <div id="aiRoutesTable">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="extra-section"
+            id="vehicles"
+        >
+
+            <h2>
+                🚚 Vehicle Monitoring
+            </h2>
+
+            <div class="feature-grid">
+
+                <div>
+                    <h3>
+                        Active
+                    </h3>
+
+                    <strong>
+                        128
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        Moving
+                    </h3>
+
+                    <strong>
+                        112
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        Delayed
+                    </h3>
+
+                    <strong>
+                        12
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        Offline
+                    </h3>
+
+                    <strong>
+                        4
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="extra-section"
+            id="deliveries"
+        >
+
+            <h2>
+                📦 Delivery Monitoring
+            </h2>
+
+            <div class="feature-grid">
+
+                <div>
+                    <h3>
+                        Total
+                    </h3>
+
+                    <strong>
+                        342
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        In Transit
+                    </h3>
+
+                    <strong>
+                        218
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        Pending
+                    </h3>
+
+                    <strong>
+                        89
+                    </strong>
+                </div>
+
+                <div>
+                    <h3>
+                        Delayed
+                    </h3>
+
+                    <strong>
+                        35
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="extra-section"
+            id="alerts"
+        >
+
+            <h2>
+                ⚠️ Alerts
+            </h2>
+
+            <div class="alert-box">
+                🚧 Road blockage detected on
+                selected route.
+            </div>
+
+            <div class="alert-box">
+                🌦️ Weather conditions require
+                monitoring.
+            </div>
+
+            <div class="alert-box">
+                🚦 Traffic congestion detected.
+            </div>
+
+        </section>
+
+
+        <section
+            class="extra-section"
+            id="settings"
+        >
+
+            <h2>
+                ⚙️ Settings
+            </h2>
+
+            <div class="feature-grid">
+
+                <div>
+                    🗺️
+                    <h3>
+                        Map Settings
+                    </h3>
+                </div>
+
+                <div>
+                    🤖
+                    <h3>
+                        AI Route Settings
+                    </h3>
+                </div>
+
+                <div>
+                    🔔
+                    <h3>
+                        Notifications
+                    </h3>
+                </div>
+
+                <div>
+                    📡
+                    <h3>
+                        Live Tracking
+                    </h3>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<div
+    id="detailsModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <button
+            class="close-button"
+            onclick="closeDetails()"
+        >
+            ×
+        </button>
+
+        <h2 id="modalTitle">
+            Details
+        </h2>
+
+        <div id="modalBody">
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
